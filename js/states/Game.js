@@ -16,6 +16,13 @@ Rpg.GameState = {
         this.loadLevel();
     },
     update: function() {
+
+        //player can't walk through walls
+        this.game.physics.arcade.collide(this.player, this.collisionLayer);
+
+        //items collection
+        this.game.physics.arcade.overlap(this.player, this.items, this.collect, null, this);
+
         //player stops each time
         this.player.body.velocity.x = 0;
         this.player.body.velocity.y = 0;
@@ -41,7 +48,7 @@ Rpg.GameState = {
         }
 
         //play walking animation while player is moving
-        if(this.player.body.velocity.x != 0 || this.player.body.velocity.y != 0) {
+        if(this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0) {
             this.player.play('walk');
         }
         else {
@@ -70,7 +77,18 @@ Rpg.GameState = {
             attack: 12,
             defense: 8,
             gold: 100,
-            quests: [],
+            quests: [
+                {
+                    name: 'Find the Magic Scroll',
+                    code: 'magic-scroll',
+                    isCompleted: false
+                },
+                {
+                    name: 'Find the Helmet of the Gods',
+                    code: 'gods-helmet',
+                    isCompleted: false
+                }
+            ],
         };
 
         this.player = new Rpg.Player(this, 100, 100, playerData);
@@ -113,5 +131,41 @@ Rpg.GameState = {
             downright: true,
             action: true
         });
+
+        this.showPlayerIcons();
+    },
+    collect: function(player, item) {
+        this.player.collectItem(item);
+    },
+    showPlayerIcons: function() {
+        var style = {font: '14px Arial', fill: '#fff'};
+
+        //gold icon
+        this.goldIcon = this.add.sprite(10, 10, 'coin');
+        this.goldIcon.fixedToCamera = true;
+
+        this.goldLabel = this.add.text(30,10, '0', style);
+        this.goldLabel.fixedToCamera = true;
+
+        //attack icon
+        this.attackIcon = this.add.sprite(70, 10, 'sword');
+        this.attackIcon.fixedToCamera = true;
+
+        this.attackLabel = this.add.text(90,10, '0', style);
+        this.attackLabel.fixedToCamera = true;
+
+        //defense icon
+        this.defenseIcon = this.add.sprite(130, 10, 'shield');
+        this.defenseIcon.fixedToCamera = true;
+
+        this.defenseLabel = this.add.text(150,10, '0', style);
+        this.defenseLabel.fixedToCamera = true;
+
+        this.refreshStats();
+    },
+    refreshStats: function() {
+        this.goldLabel.text = this.player.data.gold;
+        this.attackLabel.text = this.player.data.attack;
+        this.defenseLabel.text = this.player.data.defense;
     }
 };
