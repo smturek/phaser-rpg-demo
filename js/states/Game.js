@@ -97,21 +97,16 @@ Rpg.GameState = {
 
         //group of items
         this.items = this.add.group();
+        this.loadItems();
 
-        var potion = new Rpg.Item(this, 100, 150, 'potion', {health: 10});
-        this.items.add(potion);
+        //group of enemies
+        this.enemies = this.add.group();
+        this.loadEnemies();
 
-        var sword = new Rpg.Item(this, 100, 180, 'sword', {attack: 2});
-        this.items.add(sword);
+        this.battle = new Rpg.Battle(this.game);
 
-        var shield = new Rpg.Item(this, 100, 210, 'shield', {defense: 2});
-        this.items.add(shield);
-
-        var treasure = new Rpg.Item(this, 100, 240, 'chest', {gold: 100});
-        this.items.add(sword);
-
-        var questItem = new Rpg.Item(this, 100, 270, 'scroll', {isQuest: true, questCode: 'magic-scroll'});
-        this.items.add(shield);
+        //follow player with camera
+        this.game.camera.follow(this.player);
 
         this.initGUI();
     },
@@ -167,5 +162,26 @@ Rpg.GameState = {
         this.goldLabel.text = this.player.data.gold;
         this.attackLabel.text = this.player.data.attack;
         this.defenseLabel.text = this.player.data.defense;
+    },
+    findObjectsByType: function(targetType, tilemap, layer) {
+        var result = [];
+
+        tilemap.objects[layer].forEach(function(element) {
+            if(element.properties.type == targetType) {
+                element.y -= tilemap.tileHeight/2;
+                element.x += tilemap.tileHeight/2;
+                result.push(element);
+            }
+        }, this);
+        return result;
+    },
+    loadItems: function() {
+        var elementsArray = this.findObjectsByType('item', this.map, 'objectsLayer');
+        var elementObj;
+
+        elementsArray.forEach(function(element) {
+            elementObj = new Rpg.Item(this, element.x, element.y, element.properties.asset, element.properties);
+            this.items.add(elementObj);
+        }, this);
     }
 };

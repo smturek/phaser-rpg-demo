@@ -1,6 +1,6 @@
 var Rpg = Rpg || {};
 
-Rpg.Item = function(state, x, y, key, data) {
+Rpg.Enemy = function(state, x, y, key, data) {
     Phaser.Sprite.call(this, state.game, x, y, key);
 
     this.state = state;
@@ -12,10 +12,9 @@ Rpg.Item = function(state, x, y, key, data) {
     this.data.attack = +this.data.attack;
     this.data.defense = +this.data.defense;
     this.data.health = +this.data.health;
-    this.data.gold = +this.data.gold;
 
     this.game.physics.arcade.enable(this);
 };
 
-Rpg.Item.prototype = Object.create(Phaser.Sprite.prototype);
-Rpg.Item.prototype.constructor = Rpg.Item;
+Rpg.Enemy.prototype = Object.create(Phaser.Sprite.prototype);
+Rpg.Enemy.prototype.constructor = Rpg.Enemy;
