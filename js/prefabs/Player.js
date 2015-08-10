@@ -11,7 +11,14 @@ Rpg.Player = function(state, x, y, data) {
 
     this.animations.add('walk', [0, 1, 0], 6, false);
 
+    //adds health bar
+    this.healthBar = new Phaser.Sprite(this.game, this.x, this.y, 'preloadbar');
+    this.game.add.existing(this.healthBar);
+    this.healthBar.anchor.setTo(0.5);
+    this.refreshHealthBar();
+
     this.game.physics.arcade.enable(this);
+    this.game.physics.arcade.enable(this.healthBar);
 };
 
 Rpg.Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -52,4 +59,15 @@ Rpg.Player.prototype.checkQuestCompletion = function(item) {
         }
         i++;
     }
+};
+
+Rpg.Player.prototype.refreshHealthBar = function() {
+    this.healthBar.scale.setTo(this.data.health, 0.5);
+};
+
+Rpg.Player.prototype.update = function() {
+    this.healthBar.x = this.x;
+    this.healthBar.y = this.y - 25;
+
+    this.healthBar.body.velocity = this.body.velocity;
 };

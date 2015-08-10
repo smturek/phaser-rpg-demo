@@ -23,6 +23,9 @@ Rpg.GameState = {
         //items collection
         this.game.physics.arcade.overlap(this.player, this.items, this.collect, null, this);
 
+        //attacking enemies
+        this.game.physics.arcade.collide(this.player, this.enemies, this.attack, null, this);
+
         //player stops each time
         this.player.body.velocity.x = 0;
         this.player.body.velocity.y = 0;
@@ -183,5 +186,36 @@ Rpg.GameState = {
             elementObj = new Rpg.Item(this, element.x, element.y, element.properties.asset, element.properties);
             this.items.add(elementObj);
         }, this);
+    },
+    loadEnemies: function() {
+        var elementsArray = this.findObjectsByType('enemy', this.map, 'objectsLayer');
+        var elementObj;
+
+        elementsArray.forEach(function(element) {
+            elementObj = new Rpg.Enemy(this, element.x, element.y, element.properties.asset, element.properties);
+            this.enemies.add(elementObj);
+        }, this);
+    },
+    attack: function(player, enemy) {
+        this.battle.attack(player, enemy);
+        this.battle.attack(enemy, player);
+
+        //player bounces back
+        if(player.body.touching.up) {
+            player.y += 10;
+        }
+        if(player.body.touching.down) {
+            player.y -= 10;
+        }
+        if(player.body.touching.left) {
+            player.x += 10;
+        }
+        if(player.body.touching.right) {
+            player.x -= 10;
+        }
+
+        if(player.data.health <= 0) {
+            this.gameOver();
+        }
     }
 };

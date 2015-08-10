@@ -17,7 +17,7 @@ Rpg.PreloadState = {
         this.load.image('scroll', 'assets/images/scroll-skull.png');
         this.load.image('strangeItem', 'assets/images/gods-helmet.png');
 
-        this.load.image('demon', 'assets/images/demon.png');
+        this.load.image('monster', 'assets/images/demon.png');
         this.load.image('dragon', 'assets/images/goldendragon.png');
         this.load.image('snake', 'assets/images/snake.png');
         this.load.image('skeleton', 'assets/images/swordskeleton.png');
