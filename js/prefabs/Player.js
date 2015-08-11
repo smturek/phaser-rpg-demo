@@ -5,7 +5,7 @@ Rpg.Player = function(state, x, y, data) {
 
     this.state = state;
     this.game = state.game;
-    this.data = data;
+    this.data = Object.create(data);
 
     this.anchor.setTo(0.5);
 
@@ -53,8 +53,8 @@ Rpg.Player.prototype.checkQuestCompletion = function(item) {
 
     while(i < length) {
         if(this.data.quests[i].code == item.data.questCode) {
-            this.data.quest[i].isCompleted = true;
-            console.log(this.data.quest[i].name + ' has been completed');
+            this.data.quests[i].isCompleted = true;
+            console.log(this.data.quests[i].name + ' has been completed');
             break;
         }
         i++;

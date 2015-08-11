@@ -30,19 +30,21 @@ Rpg.GameState = {
         this.player.body.velocity.x = 0;
         this.player.body.velocity.y = 0;
 
-        if(this.cursors.left.isDown || this.player.btnsPressed.left || this.player.btnsPressed.upleft || this.player.btnsPressed.downleft) {
-            this.player.body.velocity.x = -this.PLAYER_SPEED;
-            this.player.scale.setTo(1,1);
-        }
-        if(this.cursors.right.isDown || this.player.btnsPressed.right || this.player.btnsPressed.upright || this.player.btnsPressed.downright) {
-            this.player.body.velocity.x = this.PLAYER_SPEED;
-            this.player.scale.setTo(-1,1);
-        }
-        if(this.cursors.down.isDown || this.player.btnsPressed.down || this.player.btnsPressed.downright || this.player.btnsPressed.downleft) {
-            this.player.body.velocity.y = this.PLAYER_SPEED;
-        }
-        if(this.cursors.up.isDown || this.player.btnsPressed.up || this.player.btnsPressed.upright || this.player.btnsPressed.upleft) {
-            this.player.body.velocity.y = -this.PLAYER_SPEED;
+        if(!this.uiBlocked) {
+            if(this.cursors.left.isDown || this.player.btnsPressed.left || this.player.btnsPressed.upleft || this.player.btnsPressed.downleft) {
+                this.player.body.velocity.x = -this.PLAYER_SPEED;
+                this.player.scale.setTo(1,1);
+            }
+            if(this.cursors.right.isDown || this.player.btnsPressed.right || this.player.btnsPressed.upright || this.player.btnsPressed.downright) {
+                this.player.body.velocity.x = this.PLAYER_SPEED;
+                this.player.scale.setTo(-1,1);
+            }
+            if(this.cursors.down.isDown || this.player.btnsPressed.down || this.player.btnsPressed.downright || this.player.btnsPressed.downleft) {
+                this.player.body.velocity.y = this.PLAYER_SPEED;
+            }
+            if(this.cursors.up.isDown || this.player.btnsPressed.up || this.player.btnsPressed.upright || this.player.btnsPressed.upleft) {
+                this.player.body.velocity.y = -this.PLAYER_SPEED;
+            }
         }
 
         //stop all movement if nothing is being pressed
@@ -134,6 +136,7 @@ Rpg.GameState = {
     },
     collect: function(player, item) {
         this.player.collectItem(item);
+        this.player.refreshHealthBar();
     },
     showPlayerIcons: function() {
         var style = {font: '14px Arial', fill: '#fff'};
@@ -160,6 +163,35 @@ Rpg.GameState = {
         this.defenseLabel.fixedToCamera = true;
 
         this.refreshStats();
+
+        this.questIcon = this.add.sprite(this.game.width - 30, 10, 'quest');
+        this.questIcon.fixedToCamera = true;
+
+        //init quests info panel
+        this.overlay = this.add.bitmapData(this.game.width, this.game.height);
+        this.overlay.ctx.fillStyle = '#000';
+        this.overlay.ctx.fillRect(0, 0, this.game.width, this.game.height);
+
+        this.questsPanelGroup = this.add.group();
+        this.questsPanelGroup.y = this.game.height;
+        this.questsPanel = new Phaser.Sprite(this.game, 0, 0, this.overlay);
+        this.questsPanel.alpha = 0.8;
+        this.questsPanel.fixedToCamera = true;
+        this.questsPanelGroup.add(this.questsPanel);
+
+        //content of the panel
+        style = {font: '14px Arial', fill: '#fff'};
+        this.questInfo = new Phaser.Text(this.game, 50, 50, '', style);
+        this.questInfo.fixedToCamera = true;
+        this.questsPanelGroup.add(this.questInfo);
+
+        //show quests when you touch the quest icon
+        this.questIcon.inputEnabled = true;
+        this.questIcon.events.onInputDown.add(this.showQuests, this);
+
+        //hide quest panel when touched
+        this.questsPanel.inputEnabled = true;
+        this.questsPanel.events.onInputDown.add(this.hideQuests, this);
     },
     refreshStats: function() {
         this.goldLabel.text = this.player.data.gold;
@@ -217,5 +249,36 @@ Rpg.GameState = {
         if(player.data.health <= 0) {
             this.gameOver();
         }
+    },
+    showQuests: function() {
+        //player can't move anymore
+        this.uiBlocked = true;
+
+        //tween to show the panel
+        var showPanelTween = this.add.tween(this.questsPanelGroup);
+        showPanelTween.to({y: 0}, 150);
+
+        //show the quests when the panel reached the top
+        showPanelTween.onComplete.add(function(){
+            //show all the quests
+            var questsText = 'QUESTS\n';
+
+            //iterate through all the quests
+            this.player.data.quests.forEach(function(quest){
+                questsText += quest.name + (quest.isCompleted ? ' - COMPLETE' : ' - INCOMPLETE') + '\n';
+            }, this);
+
+            //show the text
+            this.questInfo.text = questsText;
+        }, this);
+
+        showPanelTween.start();
+    },
+    hideQuests: function() {
+        this.questsPanelGroup.y = this.game.height;
+        this.questInfo.text = '';
+
+        //release the UI
+        this.uiBlocked = false;
     }
 };

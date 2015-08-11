@@ -5,7 +5,7 @@ Rpg.Enemy = function(state, x, y, key, data) {
 
     this.state = state;
     this.game = state.game;
-    this.data = data;
+    this.data = Object.create(data);
     this.anchor.setTo(0.5);
 
     //make properties numbers
